@@ -26,6 +26,7 @@
 		<div>
 			<p>employees 프로젝트 메인 페이지입니다</p>
 			<p>해당 프로젝트는 employees DB를 조회하기 위한 웹 프로젝트입니다</p>
+			<p><a href="https://github.com/1F24DCA/portfolio-java-web/tree/employees/employees">프로젝트 소스 코드 (GitHub)</a></p>
 		</div>
 	</body>
 </html>
