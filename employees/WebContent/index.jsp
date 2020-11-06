@@ -23,6 +23,9 @@
 		<h1>메인 페이지</h1>
 		
 		<!-- 컨텐츠 -->
-		<div></div>
+		<div>
+			<p>employees 프로젝트 메인 페이지입니다</p>
+			<p>해당 프로젝트는 employees DB를 조회하기 위한 웹 프로젝트입니다</p>
+		</div>
 	</body>
 </html>
