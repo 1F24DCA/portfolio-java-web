@@ -13,7 +13,14 @@
 		Class.forName("org.mariadb.jdbc.Driver");
 		Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost/employees", "root", "java1004");
 		
-		// TODO: DB에서 데이터를 가져오는 코드 작성
+		String sql = "SELECT dept_no, dept_name FROM departments ORDER BY dept_no ASC";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		System.out.println("debug: PreparedStatement 쿼리: \n\t"+stmt.toString());
+		
+		ResultSet rs = stmt.executeQuery();
+		while (rs.next()) {
+			System.out.println("debug: ResultSet 행: "+rs.getString("dept_no")+", "+rs.getString("dept_name"));
+		}
 	%>
 	
 	<body>
@@ -36,6 +43,8 @@
 	</body>
 	
 	<%
+		rs.close();
+		stmt.close();
 		conn.close();
 	%>
 </html>
