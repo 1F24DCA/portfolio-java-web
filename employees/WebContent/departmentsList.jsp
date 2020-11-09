@@ -57,9 +57,9 @@
 		}
 		
 		// 테스트용 출력
-		System.out.println("debug: 현재 페이지: "+currentPage);
-		System.out.println("debug: 쿼리 데이터 추출 시작 행: "+beginRow);
-		System.out.println("debug: 마지막 페이지: "+lastPage);
+//		System.out.println("debug: 현재 페이지: "+currentPage);
+//		System.out.println("debug: 쿼리 데이터 추출 시작 행: "+beginRow);
+//		System.out.println("debug: 마지막 페이지: "+lastPage);
 	%>
 	
 	<body>
@@ -98,6 +98,27 @@
 				%>
 			</tbody>
 		</table>
+		
+		<!-- 페이지 관리 기능 -->
+		<div>
+			<%
+				if (currentPage > 1) {
+			%>
+					<a href="./departmentsList.jsp?currentPage=<%=currentPage-1 %>">이전</a>
+			<%
+				}
+			%>
+			
+			<span>현재 <%=currentPage %> 페이지 / 총 <%=lastPage %> 페이지</span>
+			
+			<%
+				if (currentPage < lastPage) {
+			%>
+					<a href="./departmentsList.jsp?currentPage=<%=currentPage+1 %>">다음</a>
+			<%
+				}
+			%>
+		</div>
 	</body>
 	
 	<%
