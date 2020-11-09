@@ -12,48 +12,48 @@
 	<%
 	// 1. 페이지 분할 작업을 위한 코드
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
-		// : SELECT ... LIMIT (beginRow), (rowPerPage)		
-		int beginRow = 0; // 테이블에서 보여질 시작 행
-		int rowPerPage = 5; // 테이블에서 보여질 행 갯수
-		int lastPage = 0; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
+		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)
+		int listBeginIndex = 0; // 테이블에서 보여질 시작 행
+		int listPageSize = 5; // 테이블에서 보여질 행 갯수
+		int listLastPage = 0; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
-		int currentPage = 1; // 현재 페이지, 사용자의 입력을 받음
+		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
 		if (request.getParameter("currentPage") != null) {
-			currentPage = Integer.parseInt(request.getParameter("currentPage"));
+			listPage = Integer.parseInt(request.getParameter("currentPage"));
 		}
 		
 		// 간단한 알고리즘을 이용해 시작 행 계산
-		beginRow = (currentPage-1)*rowPerPage;
+		listBeginIndex = (listPage-1)*listPageSize;
 		
 	// 2. DB에 접속하는 코드
 		Class.forName("org.mariadb.jdbc.Driver");
 		Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost/employees", "root", "java1004");
 		
 		// TODO: 동적 쿼리로 변환될 때, 이녀석들을 한번에 바꿔줌
-		String sql = "SELECT dept_no, dept_name FROM departments ORDER BY dept_no ASC LIMIT ?, ?";
-		String lastPageSql = "SELECT COUNT(*) FROM departments";
+		String selectListSql = "SELECT dept_no, dept_name FROM departments ORDER BY dept_no ASC LIMIT ?, ?";
+		String selectListSizeSql = "SELECT COUNT(*) FROM departments";
 		
 	// 2-1. DB에서 테이블 데이터 추출을 위한 코드
-		PreparedStatement stmt = conn.prepareStatement(sql);
-		stmt.setInt(1, beginRow);
-		stmt.setInt(2, rowPerPage);
-		System.out.println("debug: PreparedStatement 쿼리: \n\t"+stmt.toString());
+		PreparedStatement selectListStmt = conn.prepareStatement(selectListSql);
+		selectListStmt.setInt(1, listBeginIndex);
+		selectListStmt.setInt(2, listPageSize);
+		System.out.println("debug: selectListStmt 쿼리: \n\t"+selectListStmt.toString());
 		
-		ResultSet rs = stmt.executeQuery();
+		ResultSet selectListRs = selectListStmt.executeQuery();
 		
 	// 2-2. 마지막 페이지를 구하기 위한 코드
-		int rowCount = 0; // 행 갯수, 마지막 페이지를 구하는 데 사용
+		int listSize = 0; // 전체 목록 아이템 갯수, 마지막 페이지를 구하는 데 사용
 		
-		PreparedStatement lastPageStmt = conn.prepareStatement(lastPageSql);
-		ResultSet lastPageRs = lastPageStmt.executeQuery();
-		if (lastPageRs.next()) {
-			rowCount = lastPageRs.getInt("COUNT(*)");
+		PreparedStatement selectListSizeStmt = conn.prepareStatement(selectListSizeSql);
+		ResultSet selectListSizeRs = selectListSizeStmt.executeQuery();
+		if (selectListSizeRs.next()) {
+			listSize = selectListSizeRs.getInt("COUNT(*)");
 		}
 		
 		// 간단한 알고리즘을 이용해 마지막 페이지 계산
-		lastPage = rowCount/rowPerPage;
-		if (rowCount%rowPerPage != 0) {
-			lastPage += 1;
+		listLastPage = listSize/listPageSize;
+		if (listSize%listPageSize != 0) {
+			listLastPage += 1;
 		}
 		
 		// 테스트용 출력
@@ -87,11 +87,11 @@
 			</thead>
 			<tbody>
 				<%
-					while (rs.next()) {
+					while (selectListRs.next()) {
 				%>
 						<tr>
-							<td><%=rs.getString("dept_no") %></td>
-							<td><%=rs.getString("dept_name") %></td>
+							<td><%=selectListRs.getString("dept_no") %></td>
+							<td><%=selectListRs.getString("dept_name") %></td>
 						</tr>
 				<%
 					}
@@ -102,19 +102,19 @@
 		<!-- 페이지 관리 기능 -->
 		<div>
 			<%
-				if (currentPage > 1) {
+				if (listPage > 1) {
 			%>
-					<a href="./departmentsList.jsp?currentPage=<%=currentPage-1 %>">이전</a>
+					<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
 				}
 			%>
 			
-			<span>현재 <%=currentPage %> 페이지 / 총 <%=lastPage %> 페이지</span>
+			<span>현재 <%=listPage %> 페이지 / 총 <%=listLastPage %> 페이지</span>
 			
 			<%
-				if (currentPage < lastPage) {
+				if (listPage < listLastPage) {
 			%>
-					<a href="./departmentsList.jsp?currentPage=<%=currentPage+1 %>">다음</a>
+					<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
 			<%
 				}
 			%>
@@ -122,8 +122,8 @@
 	</body>
 	
 	<%
-		rs.close();
-		stmt.close();
+		selectListRs.close();
+		selectListStmt.close();
 		conn.close();
 	%>
 </html>
