@@ -45,6 +45,8 @@
 		int listSize = 0; // 전체 목록 아이템 갯수, 마지막 페이지를 구하는 데 사용
 		
 		PreparedStatement selectListSizeStmt = conn.prepareStatement(selectListSizeSql);
+		System.out.println("debug: selectListSizeStmt 쿼리: \n\t"+selectListSizeStmt.toString());
+		
 		ResultSet selectListSizeRs = selectListSizeStmt.executeQuery();
 		if (selectListSizeRs.next()) {
 			listSize = selectListSizeRs.getInt("COUNT(*)");
@@ -122,6 +124,8 @@
 	</body>
 	
 	<%
+		selectListSizeRs.close();
+		selectListSizeStmt.close();
 		selectListRs.close();
 		selectListStmt.close();
 		conn.close();
