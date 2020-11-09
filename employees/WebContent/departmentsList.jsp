@@ -18,8 +18,11 @@
 		int listLastPage = 0; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
-		if (request.getParameter("currentPage") != null) {
-			listPage = Integer.parseInt(request.getParameter("currentPage"));
+		
+		// 사용자가 요청한 값을 받아와서 처리
+		String inputListPage = request.getParameter("listPage");
+		if (inputListPage != null && inputListPage.matches("^\\d+$")) { // 숫자값인지 검사하기 위해 정규표현식을 사용
+			listPage = Integer.parseInt(inputListPage);
 		}
 		
 		// 간단한 알고리즘을 이용해 시작 행 계산
