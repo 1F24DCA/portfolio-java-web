@@ -18,9 +18,6 @@
 		System.out.println("debug: PreparedStatement 쿼리: \n\t"+stmt.toString());
 		
 		ResultSet rs = stmt.executeQuery();
-		while (rs.next()) {
-			System.out.println("debug: ResultSet 행: "+rs.getString("dept_no")+", "+rs.getString("dept_name"));
-		}
 	%>
 	
 	<body>
@@ -39,7 +36,26 @@
 		<h1>부서 목록</h1>
 		
 		<!-- 컨텐츠 -->
-		<div></div>
+		<table border="1">
+			<thead>
+				<tr>
+					<th>부서번호</th>
+					<th>부서명</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%
+					while (rs.next()) {
+				%>
+						<tr>
+							<td><%=rs.getString("dept_no") %></td>
+							<td><%=rs.getString("dept_name") %></td>
+						</tr>
+				<%
+					}
+				%>
+			</tbody>
+		</table>
 	</body>
 	
 	<%
