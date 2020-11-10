@@ -13,8 +13,8 @@
 	// 1. 페이지 분할 작업을 위한 코드
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)
-		int listBeginIndex = 0; // 테이블에서 보여질 시작 행
-		int listPageSize = 5; // 테이블에서 보여질 행 갯수
+		int listBeginIndex = 0; // 목록에서 보여질 시작 인덱스(0부터 시작)
+		int listPageSize = 5; // 목록에서 보여질 항목 갯수
 		int listLastPage = 0; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
