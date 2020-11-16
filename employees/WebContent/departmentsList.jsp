@@ -10,12 +10,27 @@
 	</head>
 	
 	<%
-	// 1. 페이지 분할 작업을 위한 코드
+	// 1. 테이블 내용 검색 코드
+		// SQL의 WHERE 절을 이용하여 테이블 내용 검색
+		// 클라이언트가 요청한 검색 내용을 가져옴
+		String searchDeptName = null; // 부서명 검색 조건, 사용자의 입력을 받음
+		
+		// 사용자가 요청한 값을 받아와서 처리
+		String inputDeptName = request.getParameter("deptName");
+		if (inputDeptName == null) {
+			// 받아온 문자열이 null값이면 빈 문자열로 처리
+			// 검색 폼에서 value HTML 속성을 좀 더 쉽게 작성하고 null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
+			inputDeptName = "";
+		} else {
+			searchDeptName = "%"+inputDeptName+"%";
+		}
+		
+	// 2. 페이지 분할 작업을 위한 코드
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)
-		int listBeginIndex = 0; // 테이블에서 보여질 시작 행
-		int listPageSize = 5; // 테이블에서 보여질 행 갯수
-		int listLastPage = 0; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
+		int listBeginIndex = -1; // 목록에서 보여질 시작 인덱스(0부터 시작)
+		int listPageSize = 5; // 목록에서 보여질 항목 갯수
+		int listLastPage = -1; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
 		
@@ -28,27 +43,37 @@
 		// 간단한 알고리즘을 이용해 시작 행 계산
 		listBeginIndex = (listPage-1)*listPageSize;
 		
-	// 2. DB에 접속하는 코드
+	// 3. DB에 접속하는 코드
 		Class.forName("org.mariadb.jdbc.Driver");
 		Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost/employees", "root", "java1004");
 		
-		// TODO: 동적 쿼리로 변환될 때, 이녀석들을 한번에 바꿔줌
-		String selectListSql = "SELECT dept_no, dept_name FROM departments ORDER BY dept_no ASC LIMIT ?, ?";
-		String selectListSizeSql = "SELECT COUNT(*) FROM departments";
+		// 검색에 따른 동적 쿼리 구현
+		PreparedStatement selectListStmt = null;
+		PreparedStatement selectListSizeStmt = null;
+		if (searchDeptName == null) {
+			selectListStmt = conn.prepareStatement("SELECT dept_no, dept_name FROM departments ORDER BY dept_no ASC LIMIT ?, ?");
+			selectListStmt.setInt(1, listBeginIndex);
+			selectListStmt.setInt(2, listPageSize);
+			
+			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM departments");
+		} else if (searchDeptName != null) {
+			selectListStmt = conn.prepareStatement("SELECT dept_no, dept_name FROM departments WHERE dept_name LIKE ? ORDER BY dept_no ASC LIMIT ?, ?");
+			selectListStmt.setString(1, searchDeptName);
+			selectListStmt.setInt(2, listBeginIndex);
+			selectListStmt.setInt(3, listPageSize);
+			
+			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM departments WHERE dept_name LIKE ?");
+			selectListSizeStmt.setString(1, searchDeptName);
+		}
 		
-	// 2-1. DB에서 테이블 데이터 추출을 위한 코드
-		PreparedStatement selectListStmt = conn.prepareStatement(selectListSql);
-		selectListStmt.setInt(1, listBeginIndex);
-		selectListStmt.setInt(2, listPageSize);
 		System.out.println("debug: selectListStmt 쿼리: \n\t"+selectListStmt.toString());
+		System.out.println("debug: selectListSizeStmt 쿼리: \n\t"+selectListSizeStmt.toString());
 		
+	// 3-1. DB에서 테이블 데이터 추출을 위한 코드
 		ResultSet selectListRs = selectListStmt.executeQuery();
 		
-	// 2-2. 마지막 페이지를 구하기 위한 코드
-		int listSize = 0; // 전체 목록 아이템 갯수, 마지막 페이지를 구하는 데 사용
-		
-		PreparedStatement selectListSizeStmt = conn.prepareStatement(selectListSizeSql);
-		System.out.println("debug: selectListSizeStmt 쿼리: \n\t"+selectListSizeStmt.toString());
+	// 3-2. 마지막 페이지를 구하기 위한 코드
+		int listSize = -1; // 전체 목록 아이템 갯수, 마지막 페이지를 구하는 데 사용
 		
 		ResultSet selectListSizeRs = selectListSizeStmt.executeQuery();
 		if (selectListSizeRs.next()) {
@@ -104,23 +129,41 @@
 			</tbody>
 		</table>
 		
+		<!-- 검색 기능 -->
+		<form method="get" action="./departmentsList.jsp">
+			부서명: <input type="text" name="deptName" value="<%=inputDeptName %>">
+			<button type="submit">검색</button>
+		</form>
+		
 		<!-- 페이지 관리 기능 -->
 		<div>
 			<%
-				if (listPage > 1) {
+				if (listPage > 1) { // 이전 페이지가 표시가능한 상태 (첫 페이지가 아니라면)
+					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
 			%>
-					<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
+						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
+					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
+			%>
+						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>&deptName=<%=inputDeptName %>">이전</a>
+			<%		
+					}
 				}
 			%>
 			
 			<span>현재 <%=listPage %> 페이지 / 총 <%=listLastPage %> 페이지</span>
 			
 			<%
-				if (listPage < listLastPage) {
+				if (listPage < listLastPage) { // 다음 페이지가 표시가능한 상태 (마지막 페이지가 아니라면)
+					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
 			%>
-					<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
+						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
 			<%
+					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
+			%>
+						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>&deptName=<%=inputDeptName %>">다음</a>
+			<%		
+					}
 				}
 			%>
 		</div>
