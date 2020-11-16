@@ -17,7 +17,11 @@
 		
 		// 사용자가 요청한 값을 받아와서 처리
 		String inputDeptName = request.getParameter("deptName");
-		if (inputDeptName != null) {
+		if (inputDeptName == null) {
+			// 받아온 문자열이 null값이면 빈 문자열로 처리
+			// 검색 폼에서 value HTML 속성을 좀 더 쉽게 작성하고 null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
+			inputDeptName = "";
+		} else {
 			searchDeptName = "%"+inputDeptName+"%";
 		}
 		
@@ -125,15 +129,21 @@
 			</tbody>
 		</table>
 		
+		<!-- 검색 기능 -->
+		<form method="get" action="./departmentsList.jsp">
+			부서명: <input type="text" name="deptName" value="<%=inputDeptName %>">
+			<button type="submit">검색</button>
+		</form>
+		
 		<!-- 페이지 관리 기능 -->
 		<div>
 			<%
-				if (listPage > 1) {
-					if (inputDeptName == null) {
+				if (listPage > 1) { // 이전 페이지가 표시가능한 상태 (첫 페이지가 아니라면)
+					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
-					} else if (inputDeptName != null) {
+					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>&deptName=<%=inputDeptName %>">이전</a>
 			<%		
@@ -144,12 +154,12 @@
 			<span>현재 <%=listPage %> 페이지 / 총 <%=listLastPage %> 페이지</span>
 			
 			<%
-				if (listPage < listLastPage) {
-					if (inputDeptName == null) {
+				if (listPage < listLastPage) { // 다음 페이지가 표시가능한 상태 (마지막 페이지가 아니라면)
+					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
 			<%
-					} else if (inputDeptName != null) {
+					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>&deptName=<%=inputDeptName %>">다음</a>
 			<%		
