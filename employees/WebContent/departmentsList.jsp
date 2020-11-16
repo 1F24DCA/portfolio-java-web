@@ -129,9 +129,15 @@
 		<div>
 			<%
 				if (listPage > 1) {
+					if (inputDeptName == null) {
 			%>
-					<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
+						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
+					} else if (inputDeptName != null) {
+			%>
+						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>&deptName=<%=inputDeptName %>">이전</a>
+			<%		
+					}
 				}
 			%>
 			
@@ -139,9 +145,15 @@
 			
 			<%
 				if (listPage < listLastPage) {
+					if (inputDeptName == null) {
 			%>
-					<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
+						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
 			<%
+					} else if (inputDeptName != null) {
+			%>
+						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>&deptName=<%=inputDeptName %>">다음</a>
+			<%		
+					}
 				}
 			%>
 		</div>
