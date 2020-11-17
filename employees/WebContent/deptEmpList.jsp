@@ -13,7 +13,13 @@
 		Class.forName("org.mariadb.jdbc.Driver");
 		Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost/employees", "root", "java1004");
 		
-		// TODO: DB에서 데이터를 가져오는 코드 작성
+		PreparedStatement selectListStmt = conn.prepareStatement("SELECT emp_no, dept_no, from_date, to_date FROM dept_emp ORDER BY emp_no ASC LIMIT 0, 100");
+		System.out.println("debug: PreparedStatement 쿼리: \n\t"+selectListStmt.toString());
+		
+		ResultSet selectListRs = selectListStmt.executeQuery();
+		while (selectListRs.next()) {
+			System.out.println("debug: ResultSet 행: "+selectListRs.getInt("emp_no")+", "+selectListRs.getString("dept_no")+", "+selectListRs.getString("from_date")+", "+selectListRs.getString("to_date"));
+		}
 	%>
 	
 	<body>
@@ -38,6 +44,8 @@
 	</body>
 	
 	<%
+		selectListRs.close();
+		selectListStmt.close();
 		conn.close();
 	%>
 </html>
