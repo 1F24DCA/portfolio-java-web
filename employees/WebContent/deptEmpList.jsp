@@ -1,11 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<%@ page import="java.sql.*"%>
+
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8">
 		<title>부서 근무자 목록</title>
 	</head>
+	
+	<%
+		Class.forName("org.mariadb.jdbc.Driver");
+		Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost/employees", "root", "java1004");
+		
+		// TODO: DB에서 데이터를 가져오는 코드 작성
+	%>
 	
 	<body>
 		<!-- 네비게이션 -->
@@ -23,6 +32,12 @@
 		<h1>부서 근무자 목록</h1>
 		
 		<!-- 컨텐츠 -->
-		<div></div>
+		<div>
+			
+		</div>
 	</body>
+	
+	<%
+		conn.close();
+	%>
 </html>
