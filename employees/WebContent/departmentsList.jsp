@@ -87,9 +87,9 @@
 		}
 		
 		// 테스트용 출력
-//		System.out.println("debug: 현재 페이지: "+currentPage);
-//		System.out.println("debug: 쿼리 데이터 추출 시작 행: "+beginRow);
-//		System.out.println("debug: 마지막 페이지: "+lastPage);
+//		System.out.println("debug: 현재 페이지: "+listPage);
+//		System.out.println("debug: 쿼리 데이터 추출 시작 행: "+listBeginIndex);
+//		System.out.println("debug: 마지막 페이지: "+listLastPage);
 	%>
 	
 	<body>
