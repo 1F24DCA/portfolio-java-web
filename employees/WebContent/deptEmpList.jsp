@@ -79,7 +79,7 @@
 			selectListStmt.setInt(2, listPageSize);
 			
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp");
-		} else if (searchWorking != false && searchDeptNo == null && searchEmpName == null) {
+		} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
 			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' ORDER BY emp_no ASC LIMIT ?, ?");
 			selectListStmt.setInt(1, listBeginIndex);
 			selectListStmt.setInt(2, listPageSize);
@@ -101,7 +101,7 @@
 			
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no WHERE CONCAT(employees.first_name, ' ', employees.last_name) LIKE ?");
 			selectListSizeStmt.setString(1, searchEmpName);
-		} else if (searchWorking != false && searchDeptNo != null && searchEmpName == null) {
+		} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
 			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' AND departments.dept_no = ? ORDER BY emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchDeptNo);
 			selectListStmt.setInt(2, listBeginIndex);
@@ -109,7 +109,7 @@
 			
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp WHERE to_date = '9999-01-01' AND dept_no = ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
-		} else if (searchWorking != false && searchDeptNo == null && searchEmpName != null) {
+		} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
 			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ? ORDER BY emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchEmpName);
 			selectListStmt.setInt(2, listBeginIndex);
@@ -127,7 +127,7 @@
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no WHERE dept_emp.dept_no = ? AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
 			selectListSizeStmt.setString(2, searchEmpName);
-		} else if (searchWorking != false && searchDeptNo != null && searchEmpName != null) {
+		} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
 			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' AND departments.dept_no = ? AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ? ORDER BY emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchDeptNo);
 			selectListStmt.setString(2, searchEmpName);
@@ -219,10 +219,47 @@
 		<div>
 			<%
 				if (listPage > 1) {
+					if (searchWorking == false && searchDeptNo == null && searchEmpName == null) {
 			%>
-					<a href="./deptEmpList.jsp">처음으로</a>
-					<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>">이전</a>
+						<a href="./deptEmpList.jsp">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
+			%>
+						<a href="./deptEmpList.jsp?working">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working">이전</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptEmpList.jsp?deptNo=<%=inputDeptNo %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&deptNo=<%=inputDeptNo %>">이전</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&empName=<%=inputEmpName %>">이전</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptEmpList.jsp?working&deptNo=<%=inputDeptNo %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working&deptNo=<%=inputDeptNo %>">이전</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?working&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working&empName=<%=inputEmpName %>">이전</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">이전</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">이전</a>
+			<%
+					}
 				}
 			%>
 			
@@ -230,10 +267,47 @@
 			
 			<%
 				if (listPage < listLastPage) {
+					if (searchWorking == false && searchDeptNo == null && searchEmpName == null) {
 			%>
-					<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>">다음</a>
-					<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
 			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working">마지막으로</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&deptNo=<%=inputDeptNo %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&deptNo=<%=inputDeptNo %>">마지막으로</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working&deptNo=<%=inputDeptNo %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working&deptNo=<%=inputDeptNo %>">마지막으로</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					}
 				}
 			%>
 		</div>
