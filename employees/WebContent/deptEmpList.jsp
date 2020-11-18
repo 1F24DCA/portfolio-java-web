@@ -240,6 +240,8 @@
 	</body>
 	
 	<%
+		selectListSizeRs.close();
+		selectListSizeStmt.close();
 		selectListRs.close();
 		selectListStmt.close();
 		conn.close();
