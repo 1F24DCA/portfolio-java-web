@@ -139,12 +139,12 @@
 		<div>
 			<%
 				if (listPage > 1) { // 이전 페이지가 표시가능한 상태 (첫 페이지가 아니라면)
-					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
+					if (searchDeptName == null) { // 사용자가 입력한 값이 없을 때
 			%>
 						<a href="./departmentsList.jsp">처음으로</a>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
-					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
+					} else if (searchDeptName != null) { // 사용자가 입력한 값이 있을 때
 			%>
 						<a href="./departmentsList.jsp?deptName=<%=inputDeptName %>">처음으로</a>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>&deptName=<%=inputDeptName %>">이전</a>
@@ -157,12 +157,12 @@
 			
 			<%
 				if (listPage < listLastPage) { // 다음 페이지가 표시가능한 상태 (마지막 페이지가 아니라면)
-					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
+					if (searchDeptName == null) { // 사용자가 입력한 값이 없을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
 						<a href="./departmentsList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
 			<%
-					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
+					} else if (searchDeptName != null) { // 사용자가 입력한 값이 있을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>&deptName=<%=inputDeptName %>">다음</a>
 						<a href="./departmentsList.jsp?listPage=<%=listLastPage %>&deptName=<%=inputDeptName %>">마지막으로</a>
