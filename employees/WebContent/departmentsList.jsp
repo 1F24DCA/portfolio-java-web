@@ -29,7 +29,7 @@
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)
 		int listBeginIndex = -1; // 목록에서 보여질 시작 인덱스(0부터 시작)
-		int listPageSize = 5; // 목록에서 보여질 항목 갯수
+		int listPageSize = 25; // 목록에서 보여질 항목 갯수
 		int listLastPage = -1; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
@@ -141,10 +141,12 @@
 				if (listPage > 1) { // 이전 페이지가 표시가능한 상태 (첫 페이지가 아니라면)
 					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
 			%>
+						<a href="./departmentsList.jsp">처음으로</a>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
 					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
 			%>
+						<a href="./departmentsList.jsp?deptName=<%=inputDeptName %>">처음으로</a>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>&deptName=<%=inputDeptName %>">이전</a>
 			<%		
 					}
@@ -158,10 +160,12 @@
 					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
+						<a href="./departmentsList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
 			<%
 					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>&deptName=<%=inputDeptName %>">다음</a>
+						<a href="./departmentsList.jsp?listPage=<%=listLastPage %>&deptName=<%=inputDeptName %>">마지막으로</a>
 			<%		
 					}
 				}

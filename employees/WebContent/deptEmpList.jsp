@@ -203,7 +203,7 @@
 							<td>
 								<%
 									// 부서에서 나간 날짜가 9999-01-01이라는 것은 아직 부서에서 나가지 않았다는 뜻이므로 표시하지 않음
-									if (!selectListRs.getString("dept_emp.to_date").equals("9999-01-01")) {
+									if (selectListRs.getString("dept_emp.to_date").equals("9999-01-01") == false) {
 										out.print(selectListRs.getString("dept_emp.to_date"));
 									}
 								%>
@@ -220,6 +220,7 @@
 			<%
 				if (listPage > 1) {
 			%>
+					<a href="./deptEmpList.jsp">처음으로</a>
 					<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
 				}
@@ -231,6 +232,7 @@
 				if (listPage < listLastPage) {
 			%>
 					<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>">다음</a>
+					<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
 			<%
 				}
 			%>
