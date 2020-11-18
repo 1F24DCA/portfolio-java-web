@@ -22,7 +22,10 @@
 			// 검색 폼에서 value HTML 속성을 좀 더 쉽게 작성하고 null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
 			inputDeptName = "";
 		} else {
-			searchDeptName = "%"+inputDeptName+"%";
+			// 폼을 통한 검색 시 아무것도 입력하지 않으면 검색하지 않음
+			if (inputDeptName.equals("") == false) {
+				searchDeptName = "%"+inputDeptName+"%";
+			}
 		}
 		
 	// 2. 페이지 분할 작업을 위한 코드
@@ -130,8 +133,8 @@
 		</table>
 		
 		<!-- 검색 기능 -->
-		<form method="get" action="./departmentsList.jsp">
-			부서명: <input type="text" name="deptName" value="<%=inputDeptName %>">
+		<form method="POST" action="./departmentsList.jsp">
+			검색할 부서명: <input type="text" name="deptName" value="<%=inputDeptName %>">
 			<button type="submit">검색</button>
 		</form>
 		

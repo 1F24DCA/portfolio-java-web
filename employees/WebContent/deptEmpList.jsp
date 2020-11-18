@@ -24,8 +24,11 @@
 			// 검색 폼에서 value HTML 속성을 좀 더 쉽게 작성하고 null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
 			inputWorking = "";
 		} else {
-			searchWorking = true;
-			inputWorking = "checked";
+			// 폼을 통한 검색 시 on이라고 입력해야만 검색함
+			if (inputWorking.equals("on") == true) {
+				searchWorking = true;
+				inputWorking = "checked";
+			}
 		}
 		
 		// 사용자가 요청한 값을 받아와서 처리
@@ -35,7 +38,10 @@
 			// null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
 			inputDeptNo = "";
 		} else {
-			searchDeptNo = inputDeptNo;
+			// 폼을 통한 검색 시 아무것도 입력하지 않으면 검색하지 않음
+			if (inputDeptNo.equals("") == false) {
+				searchDeptNo = inputDeptNo;
+			}
 		}
 		
 		// 사용자가 요청한 값을 받아와서 처리
@@ -45,7 +51,10 @@
 			// 검색 폼에서 value HTML 속성을 좀 더 쉽게 작성하고 null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
 			inputEmpName = "";
 		} else {
-			searchEmpName = "%"+inputEmpName+"%";
+			// 폼을 통한 검색 시 아무것도 입력하지 않으면 검색하지 않음
+			if (inputEmpName.equals("") == false) {
+				searchEmpName = "%"+inputEmpName+"%";
+			}
 		}
 		
 	// 2. 페이지 분할 작업을 위한 코드
@@ -203,8 +212,9 @@
 							<td>
 								<%
 									// 부서에서 나간 날짜가 9999-01-01이라는 것은 아직 부서에서 나가지 않았다는 뜻이므로 표시하지 않음
-									if (selectListRs.getString("dept_emp.to_date").equals("9999-01-01") == false) {
-										out.print(selectListRs.getString("dept_emp.to_date"));
+									String toDate = selectListRs.getString("dept_emp.to_date");
+									if (toDate.equals("9999-01-01") == false) {
+										out.print(toDate);
 									}
 								%>
 							</td>
@@ -214,6 +224,34 @@
 				%>
 			</tbody>
 		</table>
+		
+		<!-- 검색 기능 -->
+		<form method="POST" action="./deptEmpList.jsp">
+			<%-- working이 체크되었을때 checked 문자열을 반환하므로, checked 속성이 켜지는것과 같은 효과를 냄 --%>
+			재직중인 사원만 표시: <input type="checkbox" name="working" <%=inputWorking %>>
+			검색할 부서명:
+			<select name="deptNo">
+				<option value="">선택안함</option>
+				<%
+					PreparedStatement selectDeptStmt = conn.prepareStatement("SELECT dept_no, dept_name FROM departments");
+					ResultSet selectDeptRs = selectDeptStmt.executeQuery();
+					while (selectDeptRs.next()) {
+						String deptNo = selectDeptRs.getString("dept_no");
+						String selected = "";
+						if (deptNo.equals(inputDeptNo)) {
+							selected = "selected";
+						}
+				%>
+							<option value="<%=deptNo %>" <%=selected %>><%=selectDeptRs.getString("dept_name") %></option>
+				<%
+					}
+					selectDeptRs.close();
+					selectDeptStmt.close();
+				%>
+			</select>
+			검색할 사원명: <input type="text" name="empName" value="<%=inputEmpName %>">
+			<button type="submit">검색</button>
+		</form>
 		
 		<!-- 페이지 관리 기능 -->
 		<div>
@@ -226,8 +264,8 @@
 			<%
 					} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
 			%>
-						<a href="./deptEmpList.jsp?working">처음으로</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working">이전</a>
+						<a href="./deptEmpList.jsp?working=on">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working=on">이전</a>
 			<%
 					} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
 			%>
@@ -241,13 +279,13 @@
 			<%
 					} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
 			%>
-						<a href="./deptEmpList.jsp?working&deptNo=<%=inputDeptNo %>">처음으로</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working&deptNo=<%=inputDeptNo %>">이전</a>
+						<a href="./deptEmpList.jsp?working=on&deptNo=<%=inputDeptNo %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working=on&deptNo=<%=inputDeptNo %>">이전</a>
 			<%
 					} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
 			%>
-						<a href="./deptEmpList.jsp?working&empName=<%=inputEmpName %>">처음으로</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working&empName=<%=inputEmpName %>">이전</a>
+						<a href="./deptEmpList.jsp?working=on&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working=on&empName=<%=inputEmpName %>">이전</a>
 			<%
 					} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
 			%>
@@ -256,8 +294,8 @@
 			<%
 					} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
 			%>
-						<a href="./deptEmpList.jsp?working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">처음으로</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">이전</a>
+						<a href="./deptEmpList.jsp?working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage-1 %>&working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">이전</a>
 			<%
 					}
 				}
@@ -274,8 +312,8 @@
 			<%
 					} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
 			%>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working">다음</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working">마지막으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working=on">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working=on">마지막으로</a>
 			<%
 					} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
 			%>
@@ -289,13 +327,13 @@
 			<%
 					} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
 			%>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working&deptNo=<%=inputDeptNo %>">다음</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working&deptNo=<%=inputDeptNo %>">마지막으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working=on&deptNo=<%=inputDeptNo %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working=on&deptNo=<%=inputDeptNo %>">마지막으로</a>
 			<%
 					} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
 			%>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working&empName=<%=inputEmpName %>">다음</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working&empName=<%=inputEmpName %>">마지막으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working=on&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working=on&empName=<%=inputEmpName %>">마지막으로</a>
 			<%
 					} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
 			%>
@@ -304,8 +342,8 @@
 			<%
 					} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
 			%>
-						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">다음</a>
-						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">마지막으로</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listPage+1 %>&working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptEmpList.jsp?listPage=<%=listLastPage %>&working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">마지막으로</a>
 			<%
 					}
 				}
