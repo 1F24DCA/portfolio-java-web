@@ -22,14 +22,17 @@
 			// 검색 폼에서 value HTML 속성을 좀 더 쉽게 작성하고 null이 들어가지 않게끔 하여 NullPointerException이 발생하지 않게 하기 위함
 			inputDeptName = "";
 		} else {
-			searchDeptName = "%"+inputDeptName+"%";
+			// 폼을 통한 검색 시 아무것도 입력하지 않으면 검색하지 않음
+			if (inputDeptName.equals("") == false) {
+				searchDeptName = "%"+inputDeptName+"%";
+			}
 		}
 		
 	// 2. 페이지 분할 작업을 위한 코드
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)
 		int listBeginIndex = -1; // 목록에서 보여질 시작 인덱스(0부터 시작)
-		int listPageSize = 5; // 목록에서 보여질 항목 갯수
+		int listPageSize = 25; // 목록에서 보여질 항목 갯수
 		int listLastPage = -1; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
@@ -130,8 +133,8 @@
 		</table>
 		
 		<!-- 검색 기능 -->
-		<form method="get" action="./departmentsList.jsp">
-			부서명: <input type="text" name="deptName" value="<%=inputDeptName %>">
+		<form method="POST" action="./departmentsList.jsp">
+			검색할 부서명: <input type="text" name="deptName" value="<%=inputDeptName %>">
 			<button type="submit">검색</button>
 		</form>
 		
@@ -139,12 +142,14 @@
 		<div>
 			<%
 				if (listPage > 1) { // 이전 페이지가 표시가능한 상태 (첫 페이지가 아니라면)
-					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
+					if (searchDeptName == null) { // 사용자가 입력한 값이 없을 때
 			%>
+						<a href="./departmentsList.jsp">처음으로</a>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
-					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
+					} else if (searchDeptName != null) { // 사용자가 입력한 값이 있을 때
 			%>
+						<a href="./departmentsList.jsp?deptName=<%=inputDeptName %>">처음으로</a>
 						<a href="./departmentsList.jsp?listPage=<%=listPage-1 %>&deptName=<%=inputDeptName %>">이전</a>
 			<%		
 					}
@@ -155,13 +160,15 @@
 			
 			<%
 				if (listPage < listLastPage) { // 다음 페이지가 표시가능한 상태 (마지막 페이지가 아니라면)
-					if (inputDeptName.equals("") == true) { // 사용자가 입력한 값이 없을 때
+					if (searchDeptName == null) { // 사용자가 입력한 값이 없을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>">다음</a>
+						<a href="./departmentsList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
 			<%
-					} else if (inputDeptName.equals("") == false) { // 사용자가 입력한 값이 있을 때
+					} else if (searchDeptName != null) { // 사용자가 입력한 값이 있을 때
 			%>
 						<a href="./departmentsList.jsp?listPage=<%=listPage+1 %>&deptName=<%=inputDeptName %>">다음</a>
+						<a href="./departmentsList.jsp?listPage=<%=listLastPage %>&deptName=<%=inputDeptName %>">마지막으로</a>
 			<%		
 					}
 				}
