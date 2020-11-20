@@ -82,20 +82,25 @@
 		PreparedStatement selectListStmt = null;
 		PreparedStatement selectListSizeStmt = null;
 		
+		// 직원의 first_name과 last_name을 합쳐서 직원명을 표시함, 매번 표시할때마다 너무 길고 직관적이지 못해 따로 빼냄
+		// WHERE절에서 컬럼명의 alias를 사용할 수 없기도 함: https://stackoverflow.com/a/13031050 참고
+		final String EMP_NAME = "CONCAT(e.first_name, ' ', e.last_name)";
+		// 쿼리문에서 똑같이 사용되는 베이스가 되는 SELECT 부분, 수정할때마다 8개를 다 수정하려니 너무 힘들어서 밖으로 빼냄
+		final String BASE_QUERY = "SELECT de.emp_no, "+EMP_NAME+" emp_name, d.dept_name, de.from_date, de.to_date FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no INNER JOIN departments d ON de.dept_no = d.dept_no";
 		if (searchWorking == false && searchDeptNo == null && searchEmpName == null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setInt(1, listBeginIndex);
 			selectListStmt.setInt(2, listPageSize);
 			
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp");
 		} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE de.to_date = '9999-01-01' ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setInt(1, listBeginIndex);
 			selectListStmt.setInt(2, listPageSize);
 			
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp WHERE to_date = '9999-01-01'");
 		} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE departments.dept_no = ? ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE d.dept_no = ? ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchDeptNo);
 			selectListStmt.setInt(2, listBeginIndex);
 			selectListStmt.setInt(3, listPageSize);
@@ -103,15 +108,15 @@
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp WHERE dept_no = ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
 		} else if (searchWorking == false && searchDeptNo == null && searchEmpName != null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE CONCAT(employees.first_name, ' ', employees.last_name) LIKE ? ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE "+EMP_NAME+" LIKE ? ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchEmpName);
 			selectListStmt.setInt(2, listBeginIndex);
 			selectListStmt.setInt(3, listPageSize);
 			
-			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no WHERE CONCAT(employees.first_name, ' ', employees.last_name) LIKE ?");
+			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no WHERE "+EMP_NAME+" LIKE ?");
 			selectListSizeStmt.setString(1, searchEmpName);
 		} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' AND departments.dept_no = ? ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE de.to_date = '9999-01-01' AND d.dept_no = ? ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchDeptNo);
 			selectListStmt.setInt(2, listBeginIndex);
 			selectListStmt.setInt(3, listPageSize);
@@ -119,31 +124,31 @@
 			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp WHERE to_date = '9999-01-01' AND dept_no = ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
 		} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ? ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE de.to_date = '9999-01-01' AND "+EMP_NAME+" LIKE ? ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchEmpName);
 			selectListStmt.setInt(2, listBeginIndex);
 			selectListStmt.setInt(3, listPageSize);
 			
-			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no WHERE dept_emp.to_date = '9999-01-01' AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ?");
+			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no WHERE de.to_date = '9999-01-01' AND "+EMP_NAME+" LIKE ?");
 			selectListSizeStmt.setString(1, searchEmpName);
 		} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE departments.dept_no = ? AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ? ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE d.dept_no = ? AND "+EMP_NAME+" LIKE ? ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchDeptNo);
 			selectListStmt.setString(2, searchEmpName);
 			selectListStmt.setInt(3, listBeginIndex);
 			selectListStmt.setInt(4, listPageSize);
 			
-			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no WHERE dept_emp.dept_no = ? AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ?");
+			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no WHERE de.dept_no = ? AND "+EMP_NAME+" LIKE ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
 			selectListSizeStmt.setString(2, searchEmpName);
 		} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
-			selectListStmt = conn.prepareStatement("SELECT dept_emp.emp_no, CONCAT(employees.first_name, ' ', employees.last_name) 'emp_name', departments.dept_name, dept_emp.from_date, dept_emp.to_date FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no INNER JOIN departments ON dept_emp.dept_no = departments.dept_no WHERE dept_emp.to_date = '9999-01-01' AND departments.dept_no = ? AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ? ORDER BY emp_no ASC LIMIT ?, ?");
+			selectListStmt = conn.prepareStatement(BASE_QUERY+" WHERE de.to_date = '9999-01-01' AND d.dept_no = ? AND "+EMP_NAME+" LIKE ? ORDER BY de.emp_no ASC LIMIT ?, ?");
 			selectListStmt.setString(1, searchDeptNo);
 			selectListStmt.setString(2, searchEmpName);
 			selectListStmt.setInt(3, listBeginIndex);
 			selectListStmt.setInt(4, listPageSize);
 			
-			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp INNER JOIN employees ON dept_emp.emp_no = employees.emp_no WHERE dept_emp.to_date = '9999-01-01' AND dept_emp.dept_no = ? AND CONCAT(employees.first_name, ' ', employees.last_name) LIKE ?");
+			selectListSizeStmt = conn.prepareStatement(BASE_QUERY+"SELECT COUNT(*) FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no WHERE de.to_date = '9999-01-01' AND de.dept_no = ? AND "+EMP_NAME+" LIKE ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
 			selectListSizeStmt.setString(2, searchEmpName);
 		}
@@ -205,14 +210,14 @@
 					while (selectListRs.next()) {
 				%>
 						<tr>
-							<td><%=selectListRs.getString("dept_emp.emp_no") %></td>
+							<td><%=selectListRs.getString("emp_no") %></td>
 							<td><%=selectListRs.getString("emp_name") %></td>
-							<td><%=selectListRs.getString("departments.dept_name") %></td>
-							<td><%=selectListRs.getString("dept_emp.from_date") %></td>
+							<td><%=selectListRs.getString("dept_name") %></td>
+							<td><%=selectListRs.getString("from_date") %></td>
 							<td>
 								<%
 									// 부서에서 나간 날짜가 9999-01-01이라는 것은 아직 부서에서 나가지 않았다는 뜻이므로 표시하지 않음
-									String toDate = selectListRs.getString("dept_emp.to_date");
+									String toDate = selectListRs.getString("to_date");
 									if (toDate.equals("9999-01-01") == false) {
 										out.print(toDate);
 									}
@@ -237,12 +242,16 @@
 					ResultSet selectDeptRs = selectDeptStmt.executeQuery();
 					while (selectDeptRs.next()) {
 						String deptNo = selectDeptRs.getString("dept_no");
+						
+						// html option 태그의 속성값 selected
+						// XHTML 명세에선 selected="selected"만 가능하지만, 이외에는 selected도 가능하며 그중 그나마 짧고 간결한 selected를 사용함: https://stackoverflow.com/a/24588336 참고
+						// 사실상 JavaScript를 사용하여 작성하는게 더 좋지만, JSP페이지가 너무 길어질 것을 우려하여 편법을 사용함을 알림: https://stackoverflow.com/a/1033982 참고
 						String selected = "";
 						if (deptNo.equals(inputDeptNo)) {
 							selected = "selected";
 						}
 				%>
-							<option value="<%=deptNo %>" <%=selected %>><%=selectDeptRs.getString("dept_name") %></option>
+						<option value="<%=deptNo %>" <%=selected %>><%=selectDeptRs.getString("dept_name") %></option>
 				<%
 					}
 					selectDeptRs.close();
