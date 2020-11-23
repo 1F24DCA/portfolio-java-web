@@ -14,7 +14,7 @@
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)	
 		int listBeginIndex = -1; // 목록에서 보여질 시작 인덱스(0부터 시작)
-		int listPageSize = 25; // 목록에서 보여질 항목 갯수
+		int listPageSize = 5; // 목록에서 보여질 항목 갯수
 		int listLastPage = -1; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
@@ -117,6 +117,29 @@
 				%>
 			</tbody>
 		</table>
+		
+		<!-- 페이지 관리 기능 -->
+		<div>
+			<%
+				if (listPage > 1) {
+			%>
+					<a href="./deptManagerList.jsp">처음으로</a>
+					<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>">이전</a>
+			<%
+				}
+			%>
+			
+			<span>현재 <%=listPage %> 페이지 / 총 <%=listLastPage %> 페이지</span>
+			
+			<%
+				if (listPage < listLastPage) {
+			%>
+					<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>">다음</a>
+					<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
+			<%
+				}
+			%>
+		</div>
 	</body>
 	
 	<%
