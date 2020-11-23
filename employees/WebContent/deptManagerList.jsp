@@ -61,7 +61,7 @@
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)	
 		int listBeginIndex = -1; // 목록에서 보여질 시작 인덱스(0부터 시작)
-		int listPageSize = 2; // 목록에서 보여질 항목 갯수
+		int listPageSize = 25; // 목록에서 보여질 항목 갯수
 		int listLastPage = -1; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
@@ -226,6 +226,38 @@
 				%>
 			</tbody>
 		</table>
+		
+		<!-- 검색 기능 -->
+		<form method="POST" action="./deptManagerList.jsp">
+			<%-- working이 체크되었을때 checked 문자열을 반환하므로, checked 속성이 켜지는것과 같은 효과를 냄 --%>
+			재직중인 사원만 표시: <input type="checkbox" name="working" <%=inputWorking %>>
+			검색할 부서명:
+			<select name="deptNo">
+				<option value="">선택안함</option>
+				<%
+					PreparedStatement selectDeptStmt = conn.prepareStatement("SELECT dept_no, dept_name FROM departments");
+					ResultSet selectDeptRs = selectDeptStmt.executeQuery();
+					while (selectDeptRs.next()) {
+						String deptNo = selectDeptRs.getString("dept_no");
+						
+						// html option 태그의 속성값 selected
+						// XHTML 명세에선 selected="selected"만 가능하지만, 이외에는 selected도 가능하며 그중 그나마 짧고 간결한 selected를 사용함: https://stackoverflow.com/a/24588336 참고
+						// 사실상 JavaScript를 사용하여 작성하는게 더 좋지만, JSP페이지가 너무 길어질 것을 우려하여 편법을 사용함을 알림: https://stackoverflow.com/a/1033982 참고
+						String selected = "";
+						if (deptNo.equals(inputDeptNo)) {
+							selected = "selected";
+						}
+				%>
+						<option value="<%=deptNo %>" <%=selected %>><%=selectDeptRs.getString("dept_name") %></option>
+				<%
+					}
+					selectDeptRs.close();
+					selectDeptStmt.close();
+				%>
+			</select>
+			검색할 사원명: <input type="text" name="empName" value="<%=inputEmpName %>">
+			<button type="submit">검색</button>
+		</form>
 		
 		<!-- 페이지 관리 기능 -->
 		<div>
