@@ -61,7 +61,7 @@
 		// SQL의 LIMIT 절을 이용하여 페이지 분할
 		// : SELECT ... LIMIT (listBeginIndex), (listPageSize)	
 		int listBeginIndex = -1; // 목록에서 보여질 시작 인덱스(0부터 시작)
-		int listPageSize = 25; // 목록에서 보여질 항목 갯수
+		int listPageSize = 2; // 목록에서 보여질 항목 갯수
 		int listLastPage = -1; // 페이지 전환 버튼(다음)의 표시 여부를 결정하기 위한 마지막 페이지를 담은 변수
 		
 		int listPage = 1; // 현재 페이지, 사용자의 입력을 받음
@@ -181,7 +181,7 @@
 		<div>
 			<a href="./index.jsp">메인</a>
 			<a href="./departmentsList.jsp">부서 목록</a>
-			<a href="./deptEmpList.jsp">부서 근무자 목록</a>
+			<a href="./deptManagerList.jsp">부서 근무자 목록</a>
 			<a href="./deptManagerList.jsp">부서장 목록</a>
 			<a href="./employeesList.jsp">사원 목록</a>
 			<a href="./salariesList.jsp">급여 목록</a>
@@ -231,10 +231,47 @@
 		<div>
 			<%
 				if (listPage > 1) {
+					if (searchWorking == false && searchDeptNo == null && searchEmpName == null) {
 			%>
-					<a href="./deptManagerList.jsp">처음으로</a>
-					<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>">이전</a>
+						<a href="./deptManagerList.jsp">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>">이전</a>
 			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
+			%>
+						<a href="./deptManagerList.jsp?working=on">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&working=on">이전</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptManagerList.jsp?deptNo=<%=inputDeptNo %>">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&deptNo=<%=inputDeptNo %>">이전</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&empName=<%=inputEmpName %>">이전</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptManagerList.jsp?working=on&deptNo=<%=inputDeptNo %>">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&working=on&deptNo=<%=inputDeptNo %>">이전</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?working=on&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&working=on&empName=<%=inputEmpName %>">이전</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">이전</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">처음으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage-1 %>&working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">이전</a>
+			<%
+					}
 				}
 			%>
 			
@@ -242,10 +279,47 @@
 			
 			<%
 				if (listPage < listLastPage) {
+					if (searchWorking == false && searchDeptNo == null && searchEmpName == null) {
 			%>
-					<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>">다음</a>
-					<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
 			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName == null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&working=on">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&working=on">마지막으로</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&deptNo=<%=inputDeptNo %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&deptNo=<%=inputDeptNo %>">마지막으로</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName == null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&working=on&deptNo=<%=inputDeptNo %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&working=on&deptNo=<%=inputDeptNo %>">마지막으로</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo == null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&working=on&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&working=on&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					} else if (searchWorking == false && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					} else if (searchWorking == true && searchDeptNo != null && searchEmpName != null) {
+			%>
+						<a href="./deptManagerList.jsp?listPage=<%=listPage+1 %>&working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">다음</a>
+						<a href="./deptManagerList.jsp?listPage=<%=listLastPage %>&working=on&deptNo=<%=inputDeptNo %>&empName=<%=inputEmpName %>">마지막으로</a>
+			<%
+					}
 				}
 			%>
 		</div>
