@@ -148,7 +148,7 @@
 			selectListStmt.setInt(3, listBeginIndex);
 			selectListStmt.setInt(4, listPageSize);
 			
-			selectListSizeStmt = conn.prepareStatement(BASE_QUERY+"SELECT COUNT(*) FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no WHERE de.to_date = '9999-01-01' AND de.dept_no = ? AND "+EMP_NAME+" LIKE ?");
+			selectListSizeStmt = conn.prepareStatement("SELECT COUNT(*) FROM dept_emp de INNER JOIN employees e ON de.emp_no = e.emp_no WHERE de.to_date = '9999-01-01' AND de.dept_no = ? AND "+EMP_NAME+" LIKE ?");
 			selectListSizeStmt.setString(1, searchDeptNo);
 			selectListSizeStmt.setString(2, searchEmpName);
 		}
