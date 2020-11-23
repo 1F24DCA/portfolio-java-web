@@ -20,9 +20,6 @@
 		System.out.println("debug: PreparedStatement 쿼리: \n\t"+selectListStmt.toString());
 		
 		ResultSet selectListRs = selectListStmt.executeQuery();
-		while (selectListRs.next()) {
-			System.out.println("debug: ResultSet 행: "+selectListRs.getString("dept_no")+", "+selectListRs.getString("dept_name")+", "+selectListRs.getString("emp_name")+", "+selectListRs.getString("from_date")+", "+selectListRs.getString("to_date"));
-		}
 	%>
 	
 	<body>
@@ -41,9 +38,40 @@
 		<h1>부서장 목록</h1>
 		
 		<!-- 컨텐츠 -->
-		<div>
-			
-		</div>
+		<table border="1">
+			<thead>
+				<tr>
+					<th>부서번호</th>
+					<th>부서명</th>
+					<th>이름</th>
+					<th>부서로 들어온 날짜</th>
+					<th>부서에서 나간 날짜</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%
+					while (selectListRs.next()) {
+				%>
+						<tr>
+							<td><%=selectListRs.getString("dept_no") %></td>
+							<td><%=selectListRs.getString("dept_name") %></td>
+							<td><%=selectListRs.getString("emp_name") %></td>
+							<td><%=selectListRs.getString("from_date") %></td>
+							<td>
+								<%
+									// 부서에서 나간 날짜가 9999-01-01이라는 것은 아직 부서에서 나가지 않았다는 뜻이므로 표시하지 않음
+									String toDate = selectListRs.getString("to_date");
+									if (toDate.equals("9999-01-01") == false) {
+										out.print(toDate);
+									}
+								%>
+							</td>
+						</tr>
+				<%
+					}
+				%>
+			</tbody>
+		</table>
 	</body>
 	
 	<%
