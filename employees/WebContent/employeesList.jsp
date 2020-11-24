@@ -19,9 +19,6 @@
 		System.out.println("debug: PreparedStatement 쿼리: \n\t"+selectListStmt.toString());
 		
 		ResultSet selectListRs = selectListStmt.executeQuery();
-		while (selectListRs.next()) {
-			System.out.println("debug: ResultSet 행: "+selectListRs.getInt("emp_no")+", "+selectListRs.getString("emp_name")+", "+selectListRs.getString("birth_date")+", "+selectListRs.getString("gender")+", "+selectListRs.getString("hire_date"));
-		}
 	%>
 	
 	<body>
@@ -39,7 +36,42 @@
 		<h1>사원 목록</h1>
 		
 		<!-- 컨텐츠 -->
-		<div></div>
+		<table border="1">
+			<thead>
+				<tr>
+					<th>사원번호</th>
+					<th>이름</th>
+					<th>생년월일</th>
+					<th>성별</th>
+					<th>고용일</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%
+					while (selectListRs.next()) {
+				%>
+						<tr>
+							<td><%=selectListRs.getString("emp_no") %></td>
+							<td><%=selectListRs.getString("emp_name") %></td>
+							<td><%=selectListRs.getString("birth_date") %></td>
+							<td>
+								<%
+									// 성별이 M이면 남자, F이면 여자
+									String gender = selectListRs.getString("gender");
+									if (gender.equals("M") == true) {
+										out.print("남");
+									} else if (gender.equals("F") == true) {
+										out.print("여");
+									}
+								%>
+							</td>
+							<td><%=selectListRs.getString("hire_date") %></td>
+						</tr>
+				<%
+					}
+				%>
+			</tbody>
+		</table>
 	</body>
 	
 	<%
