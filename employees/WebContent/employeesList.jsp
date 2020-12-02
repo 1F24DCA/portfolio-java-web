@@ -61,9 +61,9 @@
 		}
 		
 		// 테스트용 출력
-		System.out.println("debug: 현재 페이지: "+listPage);
-		System.out.println("debug: 쿼리 데이터 추출 시작 행: "+listBeginIndex);
-		System.out.println("debug: 마지막 페이지: "+listLastPage);
+//		System.out.println("debug: 현재 페이지: "+listPage);
+//		System.out.println("debug: 쿼리 데이터 추출 시작 행: "+listBeginIndex);
+//		System.out.println("debug: 마지막 페이지: "+listLastPage);
 	%>
 	
 	<body>
@@ -117,9 +117,36 @@
 				%>
 			</tbody>
 		</table>
+		
+		<!-- 페이지 관리 기능 -->
+		<div>
+			<%
+				if (listPage > 1) { // 이전 페이지가 표시가능한 상태 (첫 페이지가 아니라면)
+			%>
+					<a href="./employeesList.jsp">처음으로</a>
+					<a href="./employeesList.jsp?listPage=<%=listPage-1 %>">이전</a>
+			<%
+				}
+			%>
+			
+			<span>현재 <%=listPage %> 페이지 / 총 <%=listLastPage %> 페이지</span>
+			
+			<%
+				if (listPage < listLastPage) { // 다음 페이지가 표시가능한 상태 (마지막 페이지가 아니라면)
+			%>
+					<a href="./employeesList.jsp?listPage=<%=listPage+1 %>">다음</a>
+					<a href="./employeesList.jsp?listPage=<%=listLastPage %>">마지막으로</a>
+			<%
+				}
+			%>
+		</div>
 	</body>
 	
 	<%
+		selectListSizeRs.close();
+		selectListSizeStmt.close();
+		selectListRs.close();
+		selectListStmt.close();
 		conn.close();
 	%>
 </html>
